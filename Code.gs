@@ -143,6 +143,9 @@ function doPost(e) {
     }
 
     if (data.action === "markRemoved") {
+      if (!checkOrRegisterKey(data.key)) {
+        return jsonOut({ success: false, error: "missing key" });
+      }
       if (!data.id) {
         return jsonOut({ success: false, error: "missing id" });
       }

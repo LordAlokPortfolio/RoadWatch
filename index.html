@@ -42,6 +42,20 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbwyJ8v_vYPBAvgmmCNJ6iKpbmK6xZagXPPPTUmmYj06rUP8kxe8B50yKyY5WfGovG1a/exec";
 
+  // Same self-chosen, non-secret key scheme as RoadWatch.js. A hardcoded
+  // default here would let anyone loading this public page mark reports
+  // removed, so instead each person is asked for their own key once and
+  // it's remembered in this browser only - only someone who has a key
+  // (i.e. someone actually coordinating removals) can use the button.
+  function getMarkRemovedKey() {
+    let key = localStorage.getItem("roadwatch_key");
+    if (!key) {
+      key = prompt("Enter your RoadWatch key to mark this removed:");
+      if (key) localStorage.setItem("roadwatch_key", key);
+    }
+    return key;
+  }
+
   const map = L.map('map').setView([43.65, -79.66], 10); // GTA default
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -88,9 +102,11 @@
   }
 
   function markRemoved(id) {
+    const key = getMarkRemovedKey();
+    if (!key) return;
     fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({ action: "markRemoved", id })
+      body: JSON.stringify({ action: "markRemoved", id, key })
     }).then(() => loadReports());
   }
 

@@ -53,21 +53,27 @@ those paths.
 
 ## The `key` field - what it is and isn't
 
-Every `report` and `subscribe` request must include a non-empty `key`
-field. This is **not a secret and not authentication** - say this plainly
-to anyone who asks:
+Every `report`, `subscribe`, and `markRemoved` request must include a
+non-empty `key` field. This is **not a secret and not authentication** -
+say this plainly to anyone who asks:
 
 - The backend accepts any non-empty string and remembers it the first time
   it's used (via a `checkOrRegisterKey()` check against a `Keys` tab in the
   Sheet, auto-created on first use). It works like picking your own
   password on signup - nobody approves it, it just becomes valid.
-- `index.html` never sends a key, because it never submits reports.
 - `RoadWatch.js` and the Shortcuts instructions in `INSTALL.md` ship a
   default (`"roadwatch-default"`) that anyone can leave as-is or change to
   their own value - either way it's plainly visible in a public repo and a
   shared iCloud Shortcut link, so it stops nothing but casual scripted
   abuse. Anyone who reads the repo or inspects a shared Shortcut can make
   up their own key and report freely.
+- `index.html`'s "Mark Removed" button prompts the person clicking it for
+  their own key the first time (remembered afterward via `localStorage` in
+  that browser only) rather than shipping one hardcoded default. A default
+  baked into a public page would let literally anyone loading the map mark
+  reports removed, which defeats the point - only someone who actually has
+  a key (i.e. someone coordinating removals, not a random visitor) can use
+  the button now.
 
 ## Flood cap
 
@@ -103,7 +109,9 @@ loop on the first 50 reports. Neither of those is a code problem.
 - `?action=ping` and `?action=list`
 - `report` with a valid key → row appended, status `reported`
 - `report` with no key → rejected
-- `markRemoved` → row flips to `removed`
+- `markRemoved` with a valid key → row flips to `removed`
+- `markRemoved` with no key → rejected (fixed after launch - see
+  `ANALYSIS-BRIEF.md` for the gap this closed)
 - Key auto-registration → new keys land in the `Keys` tab on first use
 - End-to-end Shortcuts flow (Method A): Dictate Text → location →
   POST to backend → real coordinates and animal name landed in the Sheet

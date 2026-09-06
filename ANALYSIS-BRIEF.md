@@ -69,12 +69,20 @@ being technically open to anyone with the URL.
   with a payload that predates this change) but nothing else.
 - A 30-reports-per-60-minutes flood cap exists, counting `Reports` rows by
   timestamp. This is the only layer that imposes an actual numeric limit.
-- `markRemoved` has **no key requirement at all** - anyone can flip any
-  report's status to `removed` with just its id, and ids are returned in
-  the public `?action=list` response. This was flagged nowhere in this
-  project's threat discussion until now: it means the "picker" workflow
-  (marking things removed) has strictly weaker protection than submitting
-  a new report.
+- `markRemoved` originally had **no key requirement at all** - anyone
+  could flip any report's status to `removed` with just its id, and ids
+  are returned in the public `?action=list` response. This was flagged
+  nowhere in this project's threat discussion until this brief was
+  written. Fixed as of commit after `327eb9d`: `markRemoved` now requires
+  the same key as `report`/`subscribe`. On `index.html`, rather than
+  baking one shared default key into the public page (which would let any
+  visitor mark things removed - no better than no check at all), the
+  "Mark Removed" button now prompts the clicking person for their own key
+  the first time and remembers it in that browser's `localStorage`. This
+  still isn't real authentication (a key is still just a self-chosen
+  string, and `localStorage` isn't a credential store), but it now
+  matches the same "someone who actually has a key" bar as reporting,
+  instead of being strictly weaker as it was before.
 - No de-duplication, no audit log of who changed what, no way to undo a
   wrongful `markRemoved`.
 - Notifications to `Responders` run via `MailApp.sendEmail`, wrapped in a
@@ -120,10 +128,14 @@ implementation loop questioned the naming.**
   stopped, or logging the report after the fact rather than in the
   moment) - it was accepted as the interaction model from the start
   without an explicit safety-vs-utility discussion.
-- `markRemoved`'s lack of any key check (section 3) is a gap that was not
-  caught during the "add a key" work because the task was scoped only to
-  `report` and `subscribe` - nobody asked whether that scoping was
-  complete, including the assistant that implemented it.
+- `markRemoved`'s original lack of any key check (section 3, now fixed)
+  was a gap that wasn't caught during the "add a key" work because the
+  task was scoped only to `report` and `subscribe` - nobody asked whether
+  that scoping was complete, including the assistant that implemented it.
+  Worth noting for the first-principles review: this is a general pattern
+  risk, not specific to this project - security work scoped narrowly by
+  a stated task list, rather than by "every action that changes shared
+  state," reliably misses the action nobody thought to name.
 
 ## 6. What was actually verified end-to-end (not aspirational)
 
