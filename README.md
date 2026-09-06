@@ -120,13 +120,19 @@ loop on the first 50 reports. Neither of those is a code problem.
 ## Confirmed working (live, tested against the deployed backend)
 
 - `?action=ping` and `?action=list`
-- `report` with a valid key → row appended, status `reported`
+- `report` with a valid reporting key → row appended, status `reported`
 - `report` with no key → rejected
-- `markRemoved` with a valid key → row flips to `removed`
-- `markRemoved` with no key → rejected (fixed after launch - see
-  `ANALYSIS-BRIEF.md` for the gap this closed)
-- Key auto-registration → new keys land in the `Keys` tab on first use
+- Reporting key auto-registration → new keys land in the `Keys` tab on
+  first use
 - End-to-end Shortcuts flow (Method A): Dictate Text → location →
   POST to backend → real coordinates and animal name landed in the Sheet
 - Siri "Hey Siri, Road Watch" trigger, including on Apple Watch once
   Location Services permission was granted to Shortcuts on the Watch
+
+Tested against an earlier version of `markRemoved` (single self-registering
+key, since replaced by the separate responder-key check above): valid key
+→ row flips to `removed`; no key → rejected. **Not yet re-verified since
+the responder-key split** - still needs: a reporting key rejected by
+`markRemoved`, a real value in `ResponderKeys` accepted, and the
+`index.html` prompt/localStorage flow clicked through by hand. Do this
+after the next redeploy, before relying on it.

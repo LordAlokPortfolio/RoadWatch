@@ -50,7 +50,7 @@ being technically open to anyone with the URL.
   stranger who reads the repo, could add or read that list depending on
   Sheet sharing settings (this was not audited as part of this work).
 
-## 3. Technical facts as of the last commit (`fd909d8`)
+## 3. Technical facts as of the last commit (`6b01a31`)
 
 - Repo is flat at root (`Code.gs`, `index.html`, `RoadWatch.js`,
   `INSTALL.md`, `README.md`) - despite `README.md`'s and comments'
@@ -58,8 +58,10 @@ being technically open to anyone with the URL.
   never actually built that way.
 - Backend: Google Apps Script bound to a Google Sheet, deployed as a
   public web app, "Anyone" access, executed as the maintainer.
-- Three Sheet tabs: `Reports` (id, timestamp, lat, lng, animal, status,
-  notes), `Responders` (email), `Keys` (key - added in this work).
+- Four Sheet tabs: `Reports` (id, timestamp, lat, lng, animal, status,
+  notes), `Responders` (email), `Keys` (key, self-registering, used by
+  `report`/`subscribe`), `ResponderKeys` (key, manually populated only by
+  the maintainer, used by `markRemoved`).
 - `report` and `subscribe` require a non-empty `key` field. The backend
   does not validate the key against anything pre-approved - it accepts
   any non-empty string and appends it to `Keys` the first time it's seen.
@@ -144,12 +146,20 @@ implementation loop questioned the naming.**
 
 ## 6. What was actually verified end-to-end (not aspirational)
 
-- `ping`, `list`, `report` (with/without key), `subscribe` semantics as
-  coded, `markRemoved`, key auto-registration into the `Keys` tab, GitHub
-  Pages serving the live map, and a real Shortcuts-based phone report
-  landing in the Sheet with real GPS coordinates. All confirmed against
-  the live deployment, not just read from source.
+- `ping`, `list`, `report` (with/without a reporting key), reporting-key
+  auto-registration into the `Keys` tab, GitHub Pages serving the live
+  map, and a real Shortcuts-based phone report landing in the Sheet with
+  real GPS coordinates. All confirmed against the live deployment, not
+  just read from source.
+- `subscribe` semantics and an earlier, since-replaced version of
+  `markRemoved` (single self-registering key, before the responder-key
+  split) were verified, but that verification predates the current
+  `ResponderKeys`-based `markRemoved` and has not been repeated against
+  it. Do not treat `markRemoved` or the responder-key split as verified
+  until it's been re-tested live: a reporting key rejected, a real
+  `ResponderKeys` value accepted, and the `index.html` prompt/localStorage
+  flow clicked through by hand.
 
-This document is current as of commit `fd909d8` on `main`. If more
+This document is current as of commit `6b01a31` on `main`. If more
 changes land after this, note the new commit hash before relying on this
 for review.
