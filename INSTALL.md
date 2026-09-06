@@ -26,6 +26,7 @@ these actions in this exact order:
    - Request Body: **JSON**
    - Add these fields:
      - `action` (Text) = `report`
+     - `key` (Text) = `PLEyPhGi2wUXuRrenjiPcyef1_v8FEKY`
      - `lat` (Number) = the `Latitude` variable from step 3
      - `lng` (Number) = the `Longitude` variable from step 4
      - `animal` (Text) = the **Dictated Text** variable from step 1
@@ -53,6 +54,11 @@ on **"Add to Siri"** — record a phrase like "Road Watch."
 2. Say the shortcut's name (e.g. "Road Watch") after raising your wrist.
    Siri runs it, asks you to dictate, you say the animal name, and it
    speaks back confirmation.
+
+Note on the `key` field: this raises the bar against casual scripted abuse
+of the shared backend, but it is not real authentication. Anyone who
+obtains this value — for example by inspecting a shared Shortcut — can
+still submit reports with it.
 
 ### The honest tradeoff of this method
 

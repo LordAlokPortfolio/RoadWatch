@@ -9,6 +9,7 @@
 // A local backup copy is also kept in iCloud in case there's no signal.
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwyJ8v_vYPBAvgmmCNJ6iKpbmK6xZagXPPPTUmmYj06rUP8kxe8B50yKyY5WfGovG1a/exec"
+const REPORT_KEY = "PLEyPhGi2wUXuRrenjiPcyef1_v8FEKY"
 const DATA_FILE = "roadwatch_data.json"
 const ANIMALS = ["Deer", "Raccoon", "Skunk", "Coyote", "Squirrel", "Bird", "Other"]
 
@@ -40,6 +41,7 @@ async function postToServer(record) {
   req.method = "POST"
   req.body = JSON.stringify({
     action: "report",
+    key: REPORT_KEY,
     lat: record.lat,
     lng: record.lng,
     animal: record.animal,

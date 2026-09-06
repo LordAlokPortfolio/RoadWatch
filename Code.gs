@@ -39,6 +39,23 @@ function notifyResponders(record) {
   }
 }
 
+// Shared-secret check for report/subscribe. This is a friction layer against
+// casual scripted abuse, not real authentication — anyone who obtains the
+// key (e.g. by inspecting a shared Shortcut) can still bypass it.
+function checkKey(providedKey) {
+  const requiredKey = PropertiesService.getScriptProperties().getProperty("REPORT_KEY");
+  return !!requiredKey && providedKey === requiredKey;
+}
+
+// Caps reports to 30/hour by counting existing rows with a timestamp in the
+// last 60 minutes.
+function isOverFloodCap(sheet) {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const rows = sheet.getDataRange().getValues();
+  const recentCount = rows.slice(1).filter(row => new Date(row[1]) > oneHourAgo).length;
+  return recentCount >= 30;
+}
+
 function jsonOut(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
@@ -70,8 +87,14 @@ function doPost(e) {
     const sheet = getSheet();
 
     if (data.action === "report") {
+      if (!checkKey(data.key)) {
+        return jsonOut({ success: false, error: "invalid or missing key" });
+      }
       if (data.lat == null || data.lng == null || !data.animal) {
         return jsonOut({ success: false, error: "missing lat, lng, or animal" });
+      }
+      if (isOverFloodCap(sheet)) {
+        return jsonOut({ success: false, error: "rate limit exceeded: max 30 reports/hour" });
       }
       const id = Utilities.getUuid();
       const timestamp = new Date().toISOString();
@@ -81,6 +104,9 @@ function doPost(e) {
     }
 
     if (data.action === "subscribe") {
+      if (!checkKey(data.key)) {
+        return jsonOut({ success: false, error: "invalid or missing key" });
+      }
       if (!data.email) {
         return jsonOut({ success: false, error: "missing email" });
       }
