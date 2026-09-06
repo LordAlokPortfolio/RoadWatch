@@ -151,15 +151,14 @@ implementation loop questioned the naming.**
   map, and a real Shortcuts-based phone report landing in the Sheet with
   real GPS coordinates. All confirmed against the live deployment, not
   just read from source.
-- `subscribe` semantics and an earlier, since-replaced version of
-  `markRemoved` (single self-registering key, before the responder-key
-  split) were verified, but that verification predates the current
-  `ResponderKeys`-based `markRemoved` and has not been repeated against
-  it. Do not treat `markRemoved` or the responder-key split as verified
-  until it's been re-tested live: a reporting key rejected, a real
-  `ResponderKeys` value accepted, and the `index.html` prompt/localStorage
-  flow clicked through by hand.
+- `subscribe` semantics, plus the current `ResponderKeys`-based
+  `markRemoved`: the reporting key (`roadwatch`) rejected, a real
+  `ResponderKeys` value accepted and flipping status to `removed`. All
+  confirmed live against the redeployed backend.
+- Not yet clicked through by hand: the `index.html` prompt/`localStorage`
+  flow itself (verified above only via direct API calls, not through the
+  actual "Mark Removed" button in a browser).
 
-This document is current as of commit `6b01a31` on `main`. If more
+This document is current as of commit `4a90753` on `main`. If more
 changes land after this, note the new commit hash before relying on this
 for review.

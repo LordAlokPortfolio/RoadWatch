@@ -128,11 +128,9 @@ loop on the first 50 reports. Neither of those is a code problem.
   POST to backend → real coordinates and animal name landed in the Sheet
 - Siri "Hey Siri, Road Watch" trigger, including on Apple Watch once
   Location Services permission was granted to Shortcuts on the Watch
+- `markRemoved` with the reporting key (`roadwatch`) → rejected
+- `markRemoved` with a real `ResponderKeys` value → row flips to `removed`
 
-Tested against an earlier version of `markRemoved` (single self-registering
-key, since replaced by the separate responder-key check above): valid key
-→ row flips to `removed`; no key → rejected. **Not yet re-verified since
-the responder-key split** - still needs: a reporting key rejected by
-`markRemoved`, a real value in `ResponderKeys` accepted, and the
-`index.html` prompt/localStorage flow clicked through by hand. Do this
-after the next redeploy, before relying on it.
+Not yet clicked through by hand: the actual `index.html` prompt/
+`localStorage` flow (verified above only via direct API calls). Worth
+doing once on the live map before relying on it for real removals.
