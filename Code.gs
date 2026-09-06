@@ -7,6 +7,7 @@
 const SHEET_NAME = "Reports";
 const RESPONDER_SHEET_NAME = "Responders";
 const KEYS_SHEET_NAME = "Keys";
+const RESPONDER_KEYS_SHEET_NAME = "ResponderKeys";
 
 function getSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -22,6 +23,20 @@ function getKeysSheet() {
   let sheet = ss.getSheetByName(KEYS_SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(KEYS_SHEET_NAME);
+    sheet.appendRow(["key"]);
+  }
+  return sheet;
+}
+
+// Creates the ResponderKeys tab on first use if it isn't there yet. Unlike
+// Keys, this tab is never auto-populated by a request - the maintainer adds
+// valid responder keys here by hand, and hands each one directly to the
+// specific person(s) who remove carcasses.
+function getResponderKeysSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(RESPONDER_KEYS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(RESPONDER_KEYS_SHEET_NAME);
     sheet.appendRow(["key"]);
   }
   return sheet;
@@ -65,6 +80,20 @@ function checkOrRegisterKey(providedKey) {
   if (existing.includes(providedKey)) return true;
   sheet.appendRow([providedKey]);
   return true;
+}
+
+// Real gate for markRemoved: the provided key must already be one the
+// maintainer manually added to the ResponderKeys tab. Unlike
+// checkOrRegisterKey, an unrecognized key is rejected, not registered -
+// a reporter's key never works here unless it was separately added as a
+// responder key too.
+function checkResponderKey(providedKey) {
+  if (!providedKey || typeof providedKey !== "string" || providedKey.trim() === "") {
+    return false;
+  }
+  const sheet = getResponderKeysSheet();
+  const existing = sheet.getDataRange().getValues().flat().filter(v => v && v !== "key");
+  return existing.includes(providedKey);
 }
 
 // Caps reports to 30/hour by counting existing rows with a timestamp in the
@@ -143,8 +172,8 @@ function doPost(e) {
     }
 
     if (data.action === "markRemoved") {
-      if (!checkOrRegisterKey(data.key)) {
-        return jsonOut({ success: false, error: "missing key" });
+      if (!checkResponderKey(data.key)) {
+        return jsonOut({ success: false, error: "invalid or missing responder key" });
       }
       if (!data.id) {
         return jsonOut({ success: false, error: "missing id" });

@@ -26,8 +26,8 @@ these actions in this exact order:
    - Request Body: **JSON**
    - Add these fields:
      - `action` (Text) = `report`
-     - `key` (Text) = `roadwatch-default` (or make up your own value - see
-       note below)
+     - `key` (Text) = `roadwatch` (the shared reporting key - see note
+       below)
      - `lat` (Number) = the `Latitude` variable from step 3
      - `lng` (Number) = the `Longitude` variable from step 4
      - `animal` (Text) = the **Dictated Text** variable from step 1
@@ -56,13 +56,11 @@ on **"Add to Siri"** - record a phrase like "Road Watch."
    Siri runs it, asks you to dictate, you say the animal name, and it
    speaks back confirmation.
 
-Note on the `key` field: this is not a secret or a login - it works like
-picking your own password on signup. Type any value you want; the backend
-accepts it and remembers it the first time you report with it, then expects
-that same value from you afterward. Leave it as `roadwatch-default` if you
-don't care about this at all. It's a friction layer against casual scripted
-abuse of the shared backend, not real authentication - anyone can make up
-their own key and start reporting with it.
+Note on the `key` field: `roadwatch` is the shared reporting key everyone
+uses - it's not a secret or a login, just a friction layer against casual
+scripted abuse of the shared backend. It does not let you mark a report
+removed on the map; that requires a separate responder key that only the
+person removing carcasses has, given to them directly by the maintainer.
 
 ### The honest tradeoff of this method
 

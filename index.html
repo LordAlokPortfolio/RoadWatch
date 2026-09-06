@@ -42,16 +42,16 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbwyJ8v_vYPBAvgmmCNJ6iKpbmK6xZagXPPPTUmmYj06rUP8kxe8B50yKyY5WfGovG1a/exec";
 
-  // Same self-chosen, non-secret key scheme as RoadWatch.js. A hardcoded
-  // default here would let anyone loading this public page mark reports
-  // removed, so instead each person is asked for their own key once and
-  // it's remembered in this browser only - only someone who has a key
-  // (i.e. someone actually coordinating removals) can use the button.
-  function getMarkRemovedKey() {
-    let key = localStorage.getItem("roadwatch_key");
+  // This is a separate responder key, not the shared reporting key from
+  // RoadWatch.js. The maintainer adds valid responder keys to a
+  // ResponderKeys tab by hand and gives them directly to whoever removes
+  // carcasses - a reporter's key does not work here. Remembered in this
+  // browser only after the first prompt.
+  function getResponderKey() {
+    let key = localStorage.getItem("roadwatch_responder_key");
     if (!key) {
-      key = prompt("Enter your RoadWatch key to mark this removed:");
-      if (key) localStorage.setItem("roadwatch_key", key);
+      key = prompt("Enter your responder key to mark this removed:");
+      if (key) localStorage.setItem("roadwatch_responder_key", key);
     }
     return key;
   }
@@ -102,7 +102,7 @@
   }
 
   function markRemoved(id) {
-    const key = getMarkRemovedKey();
+    const key = getResponderKey();
     if (!key) return;
     fetch(API_URL, {
       method: "POST",

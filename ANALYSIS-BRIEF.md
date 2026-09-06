@@ -73,16 +73,21 @@ being technically open to anyone with the URL.
   could flip any report's status to `removed` with just its id, and ids
   are returned in the public `?action=list` response. This was flagged
   nowhere in this project's threat discussion until this brief was
-  written. Fixed as of commit after `327eb9d`: `markRemoved` now requires
-  the same key as `report`/`subscribe`. On `index.html`, rather than
-  baking one shared default key into the public page (which would let any
-  visitor mark things removed - no better than no check at all), the
-  "Mark Removed" button now prompts the clicking person for their own key
-  the first time and remembers it in that browser's `localStorage`. This
-  still isn't real authentication (a key is still just a self-chosen
-  string, and `localStorage` isn't a credential store), but it now
-  matches the same "someone who actually has a key" bar as reporting,
-  instead of being strictly weaker as it was before.
+  written. First fix (commit after `327eb9d`) made it require the same
+  self-registering key as `report`/`subscribe` - which had its own flaw:
+  since that key self-registers for anyone, the one shared reporting key
+  everyone already knows would *also* work for removal, meaning any
+  reporter could quietly mark real reports as handled. Second fix
+  introduced a genuinely separate responder key: `checkResponderKey()`
+  checks against a `ResponderKeys` tab that only the maintainer populates
+  by hand (no self-registration), and `index.html` prompts for this
+  distinct key (stored under a different `localStorage` key,
+  `roadwatch_responder_key`) rather than reusing the reporting key. A
+  reporter's key does not work for removal anymore. This is still just a
+  shared string, not cryptographic authentication - a leaked responder
+  key still needs to be manually replaced in the Sheet - but it now
+  actually separates "can report" from "can mark removed," which the
+  first fix did not.
 - No de-duplication, no audit log of who changed what, no way to undo a
   wrongful `markRemoved`.
 - Notifications to `Responders` run via `MailApp.sendEmail`, wrapped in a

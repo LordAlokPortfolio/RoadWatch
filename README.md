@@ -51,29 +51,42 @@ those paths.
   notification. If they close the tab entirely, they get nothing until
   they reopen it.
 
-## The `key` field - what it is and isn't
+## Two different keys - reporting vs. removal
 
-Every `report`, `subscribe`, and `markRemoved` request must include a
-non-empty `key` field. This is **not a secret and not authentication** -
-say this plainly to anyone who asks:
+There are two separate, non-interchangeable keys. This split exists
+because a single shared key for everything would let any reporter also
+mark reports removed - the two roles need different levels of trust.
 
-- The backend accepts any non-empty string and remembers it the first time
-  it's used (via a `checkOrRegisterKey()` check against a `Keys` tab in the
-  Sheet, auto-created on first use). It works like picking your own
-  password on signup - nobody approves it, it just becomes valid.
-- `RoadWatch.js` and the Shortcuts instructions in `INSTALL.md` ship a
-  default (`"roadwatch-default"`) that anyone can leave as-is or change to
-  their own value - either way it's plainly visible in a public repo and a
-  shared iCloud Shortcut link, so it stops nothing but casual scripted
-  abuse. Anyone who reads the repo or inspects a shared Shortcut can make
-  up their own key and report freely.
-- `index.html`'s "Mark Removed" button prompts the person clicking it for
-  their own key the first time (remembered afterward via `localStorage` in
-  that browser only) rather than shipping one hardcoded default. A default
-  baked into a public page would let literally anyone loading the map mark
-  reports removed, which defeats the point - only someone who actually has
-  a key (i.e. someone coordinating removals, not a random visitor) can use
-  the button now.
+### Reporting key (`report` / `subscribe`)
+
+- Everyone uses the same shared value: `roadwatch`. This is **not a
+  secret and not authentication** - say this plainly to anyone who asks.
+- The backend accepts any non-empty string here and remembers it the
+  first time it's used (via `checkOrRegisterKey()`, against a `Keys` tab
+  in the Sheet, auto-created on first use). It works like picking your
+  own password on signup - nobody approves it, it just becomes valid.
+  It's plainly visible in this public repo and in any shared Shortcut, so
+  it stops nothing but casual scripted abuse - never call it secure.
+
+### Responder key (`markRemoved` only)
+
+- A **separate, real gate**. `index.html`'s "Mark Removed" button prompts
+  whoever clicks it for a responder key (remembered afterward via
+  `localStorage` in that browser only).
+- Unlike the reporting key, this one does **not** self-register. The
+  backend checks it against a `ResponderKeys` tab in the Sheet that only
+  the maintainer populates by hand (`checkResponderKey()` - rejects
+  anything not already in that tab). A reporter's `roadwatch` key does
+  not work here.
+- The maintainer must manually add at least one value to the
+  `ResponderKeys` tab (create the tab if `Code.gs` hasn't auto-created it
+  yet, add a `key` column, add one row per responder) and hand that value
+  directly to whoever actually removes carcasses - not published in this
+  repo or any shared Shortcut.
+- This is still just a shared string, not real cryptographic
+  authentication - if a responder key leaks, treat it as compromised and
+  replace it in the `ResponderKeys` tab. But it does close the earlier gap
+  where any reporter could also mark things removed.
 
 ## Flood cap
 
