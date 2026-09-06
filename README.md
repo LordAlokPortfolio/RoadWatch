@@ -3,19 +3,19 @@
 Public wildlife-collision reporting for Ontario roads. Report a dead animal
 by tapping a button or speaking to your Apple Watch. Every report shows up
 on a public map. Built to eventually feed data to MTO or a university
-wildlife research program — that handoff doesn't exist yet (see Status
+wildlife research program - that handoff doesn't exist yet (see Status
 below).
 
 ## What's in this repo
 
-- `backend/Code.gs` — Google Apps Script backend. One person (the maintainer)
+- `backend/Code.gs` - Google Apps Script backend. One person (the maintainer)
   deploys this once, connected to a Google Sheet. It's the single shared
   database everyone's reports go into.
-- `web/index.html` — the public map. Deploy via GitHub Pages. Shows red pins
+- `web/index.html` - the public map. Deploy via GitHub Pages. Shows red pins
   (reported) and green pins (removed), with a "Mark Removed" button on each.
-- `ios/RoadWatch.js` — the Scriptable script that runs on someone's phone or
+- `ios/RoadWatch.js` - the Scriptable script that runs on someone's phone or
   Watch and posts reports to the shared backend.
-- `ios/INSTALL.md` — how someone installs the script and sets up the Watch
+- `ios/INSTALL.md` - how someone installs the script and sets up the Watch
   voice trigger.
 
 ## Setup order
@@ -27,7 +27,7 @@ below).
 3. Push this repo to GitHub. Enable Pages on the `web/` folder (or move
    `index.html` to the repo root if your Pages setup expects that).
 4. Share the repo link. Anyone installing from `ios/INSTALL.md` will point
-   at the same shared backend automatically — they don't deploy their own.
+   at the same shared backend automatically - they don't deploy their own.
 
 ## Two separate users, two separate tools
 
@@ -35,16 +35,16 @@ below).
   Never opens the web page.
 - **Picker** (person removing the carcass): only ever opens
   `web/index.html`, kept open on their phone. New reports show as a
-  browser notification and an on-page banner while that tab is open —
+  browser notification and an on-page banner while that tab is open -
   this is not a background push notification. If they close the tab
   entirely, they get nothing until they reopen it.
 
-## Status — read before distributing this
+## Status - read before distributing this
 
 - **No auth.** Anyone can submit a report or mark one removed. There is
   nothing stopping spam or a false "removed" click.
-- **No city integration.** "Removed" only changes when a person — you, a
-  volunteer, or eventually a city account — clicks the button. Nobody at
+- **No city integration.** "Removed" only changes when a person - you, a
+  volunteer, or eventually a city account - clicks the button. Nobody at
   Animal Control or MTO is watching this automatically.
 - **Single shared backend.** Every install points at one Google account's
   Apps Script deployment. Consumer Google accounts have daily execution
