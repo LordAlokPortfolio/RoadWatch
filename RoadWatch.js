@@ -8,7 +8,7 @@
 // Every report posts to the shared public sheet at API_URL below.
 // A local backup copy is also kept in iCloud in case there's no signal.
 
-const API_URL = "PASTE_SHARED_APPS_SCRIPT_WEB_APP_URL_HERE"
+const API_URL = "https://script.google.com/macros/s/AKfycbwyJ8v_vYPBAvgmmCNJ6iKpbmK6xZagXPPPTUmmYj06rUP8kxe8B50yKyY5WfGovG1a/exec"
 const DATA_FILE = "roadwatch_data.json"
 const ANIMALS = ["Deer", "Raccoon", "Skunk", "Coyote", "Squirrel", "Bird", "Other"]
 
