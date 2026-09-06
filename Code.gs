@@ -6,6 +6,7 @@
 
 const SHEET_NAME = "Reports";
 const RESPONDER_SHEET_NAME = "Responders";
+const KEYS_SHEET_NAME = "Keys";
 
 function getSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -13,6 +14,17 @@ function getSheet() {
 
 function getResponderSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(RESPONDER_SHEET_NAME);
+}
+
+// Creates the Keys tab on first use if it isn't there yet.
+function getKeysSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(KEYS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(KEYS_SHEET_NAME);
+    sheet.appendRow(["key"]);
+  }
+  return sheet;
 }
 
 // Emails everyone in the Responders tab a maps link when a new report comes in.
@@ -39,12 +51,20 @@ function notifyResponders(record) {
   }
 }
 
-// Shared-secret check for report/subscribe. This is a friction layer against
-// casual scripted abuse, not real authentication — anyone who obtains the
-// key (e.g. by inspecting a shared Shortcut) can still bypass it.
-function checkKey(providedKey) {
-  const requiredKey = PropertiesService.getScriptProperties().getProperty("REPORT_KEY");
-  return !!requiredKey && providedKey === requiredKey;
+// Self-service key check for report/subscribe: any non-empty string is
+// accepted and remembered the first time it's used (like picking your own
+// password on signup — nobody approves it, it just becomes valid). This is
+// a friction layer against casual scripted abuse, not real authentication —
+// it only requires *some* key be present, not a specific secret one.
+function checkOrRegisterKey(providedKey) {
+  if (!providedKey || typeof providedKey !== "string" || providedKey.trim() === "") {
+    return false;
+  }
+  const sheet = getKeysSheet();
+  const existing = sheet.getDataRange().getValues().flat().filter(v => v && v !== "key");
+  if (existing.includes(providedKey)) return true;
+  sheet.appendRow([providedKey]);
+  return true;
 }
 
 // Caps reports to 30/hour by counting existing rows with a timestamp in the
@@ -87,8 +107,8 @@ function doPost(e) {
     const sheet = getSheet();
 
     if (data.action === "report") {
-      if (!checkKey(data.key)) {
-        return jsonOut({ success: false, error: "invalid or missing key" });
+      if (!checkOrRegisterKey(data.key)) {
+        return jsonOut({ success: false, error: "missing key" });
       }
       if (data.lat == null || data.lng == null || !data.animal) {
         return jsonOut({ success: false, error: "missing lat, lng, or animal" });
@@ -104,8 +124,8 @@ function doPost(e) {
     }
 
     if (data.action === "subscribe") {
-      if (!checkKey(data.key)) {
-        return jsonOut({ success: false, error: "invalid or missing key" });
+      if (!checkOrRegisterKey(data.key)) {
+        return jsonOut({ success: false, error: "missing key" });
       }
       if (!data.email) {
         return jsonOut({ success: false, error: "missing email" });
