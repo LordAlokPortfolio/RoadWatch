@@ -88,6 +88,37 @@ mark reports removed - the two roles need different levels of trust.
   replace it in the `ResponderKeys` tab. But it does close the earlier gap
   where any reporter could also mark things removed.
 
+### Important: rotating the reporting key does NOT stop abuse
+
+Be clear-eyed about this: `checkOrRegisterKey()` (used by `report` and
+`subscribe`) accepts **any** non-empty string and auto-registers it on
+first use. There is no concept of "the one current valid reporting key"
+enforced by the backend - `roadwatch` is just a convention honest
+reporters happen to use. A deliberate abuser is never restricted to
+`roadwatch`; they can send any string, including one they invent on the
+spot, and it always works. **Telling your group to switch to a new shared
+reporting value does nothing to stop someone abusing the endpoint on
+purpose** - they were never limited to the old value in the first place.
+
+What actually limits reporting abuse today is only the 30-reports/hour
+flood cap in `Code.gs`, plus manually noticing and deleting junk rows. If
+real abuse happens and that's not enough, the fix is not rotation - it's
+changing `report`'s key check from self-registering to a real allowlist
+(same model as `ResponderKeys` below), which is a real code change, not a
+one-line edit. Ask for that if it's ever needed.
+
+### Rotating the responder key (this one actually works)
+
+Unlike the reporting key, `checkResponderKey()` is a real allowlist - it
+rejects anything not already in the `ResponderKeys` tab. Replacing that
+tab's contents genuinely invalidates the old value.
+
+1. Pick a new value.
+2. Replace the row in the `ResponderKeys` tab with the new value (delete
+   the old row, add the new one).
+3. Tell whoever has removal access directly (not a group message - this
+   key should never be shared as widely as the reporting key).
+
 ## Flood cap
 
 `Code.gs` rejects a `report` once more than 30 reports have landed in the
