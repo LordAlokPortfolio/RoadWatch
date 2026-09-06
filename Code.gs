@@ -1,4 +1,4 @@
-// RoadWatch Backend — Code.gs
+// RoadWatch Backend - Code.gs
 // Deploy: Extensions > Apps Script > paste this in.
 // Deploy > New deployment > Web app > Execute as: Me, Who has access: Anyone.
 // Sheet must have a tab named "Reports" with header row:
@@ -28,12 +28,12 @@ function getKeysSheet() {
 }
 
 // Emails everyone in the Responders tab a maps link when a new report comes in.
-// Never throws — a bad email address or missing tab should not block the
+// Never throws - a bad email address or missing tab should not block the
 // report itself from being saved.
 function notifyResponders(record) {
   try {
     const sheet = getResponderSheet();
-    if (!sheet) return; // Responders tab not set up yet — skip silently
+    if (!sheet) return; // Responders tab not set up yet - skip silently
     const emails = sheet.getDataRange().getValues().flat().filter(v => v && v !== "email");
     if (emails.length === 0) return;
     const mapsLink = `https://www.google.com/maps?q=${record.lat},${record.lng}`;
@@ -53,8 +53,8 @@ function notifyResponders(record) {
 
 // Self-service key check for report/subscribe: any non-empty string is
 // accepted and remembered the first time it's used (like picking your own
-// password on signup — nobody approves it, it just becomes valid). This is
-// a friction layer against casual scripted abuse, not real authentication —
+// password on signup - nobody approves it, it just becomes valid). This is
+// a friction layer against casual scripted abuse, not real authentication -
 // it only requires *some* key be present, not a specific secret one.
 function checkOrRegisterKey(providedKey) {
   if (!providedKey || typeof providedKey !== "string" || providedKey.trim() === "") {

@@ -11,7 +11,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwyJ8v_vYPBAvgmmCNJ6iKpbmK6xZagXPPPTUmmYj06rUP8kxe8B50yKyY5WfGovG1a/exec"
 // This works like a self-chosen password, not a secret: the backend accepts
 // any non-empty value and remembers it the first time it's used. Change it
-// to anything you like, or leave the default — it's a friction layer against
+// to anything you like, or leave the default - it's a friction layer against
 // casual scripted abuse, not real authentication.
 const REPORT_KEY = "roadwatch-default"
 const DATA_FILE = "roadwatch_data.json"

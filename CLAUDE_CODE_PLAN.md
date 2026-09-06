@@ -1,4 +1,4 @@
-# RoadWatch — Claude Code execution plan
+# RoadWatch - Claude Code execution plan
 
 Hand this file to Claude Code along with this repo in the morning. It's
 written so Claude Code can execute top to bottom without you narrating it.
@@ -7,7 +7,7 @@ written so Claude Code can execute top to bottom without you narrating it.
 
 Every file in this repo (`backend/Code.gs`, `web/index.html`,
 `ios/RoadWatch.js`, `ios/INSTALL.md`) is already finished code. Claude
-Code's job is to deploy it and fill in the URL placeholder — nothing else.
+Code's job is to deploy it and fill in the URL placeholder - nothing else.
 
 - Do not refactor, "improve," add error handling, or change any logic in
   any of these files.
@@ -15,7 +15,7 @@ Code's job is to deploy it and fill in the URL placeholder — nothing else.
   `ios/RoadWatch.js` is the literal string
   `PASTE_SHARED_APPS_SCRIPT_WEB_APP_URL_HERE`, replaced with the real URL.
 - `backend/Code.gs` gets pasted into Apps Script byte-for-byte. If it
-  doesn't work as-is, stop and report the error — don't patch it silently.
+  doesn't work as-is, stop and report the error - don't patch it silently.
 - If something seems like it needs a code change to work, stop and ask
   before making it. Don't guess.
 
@@ -32,14 +32,14 @@ place. Re-authorize first if needed.
 
 ## One thing only you can do first (2 minutes, before granting access)
 
-Google requires this as an account-level security setting — no API scope or
+Google requires this as an account-level security setting - no API scope or
 Drive permission covers it. Go to:
 
 **script.google.com/home/usersettings** → turn on **"Google Apps Script API"**
 
 Without this toggle, every step below that touches Apps Script will fail
 with a permissions error, regardless of what access Claude Code is granted.
-This cannot be automated — it's a manual account setting, not something
+This cannot be automated - it's a manual account setting, not something
 OAuth consent replaces.
 
 ## What Claude Code needs access to
@@ -48,7 +48,7 @@ OAuth consent replaces.
   creating and editing bound Apps Script projects, and creating Apps Script
   deployments (`script.projects`, `script.deployments`, in addition to
   standard Drive scope). If the connected Google Drive tool only grants
-  file read/write and not the Apps Script scopes, step 3 below will fail —
+  file read/write and not the Apps Script scopes, step 3 below will fail -
   in that case Claude Code should stop and report exactly which step needs
   you to do it manually, not silently skip it.
 - GitHub access (existing `gh` auth or repo push access) to create the repo
@@ -60,7 +60,7 @@ OAuth consent replaces.
    Reports." Rename the first tab to `Reports`. Set row 1 to:
    `id, timestamp, lat, lng, animal, status, notes`. Add a second tab named
    `Responders` with row 1: `email`. Add the actual responder's email
-   address (the person who wants direction notifications) as row 2 — this
+   address (the person who wants direction notifications) as row 2 - this
    is a manual entry, not a signup form, since it's 1–2 people right now.
 
 2. **Create the bound Apps Script project.** Attach a script project to
@@ -70,12 +70,12 @@ OAuth consent replaces.
 3. **Deploy as a web app.** Create a deployment: type Web app, execute as
    the owner, access level "Anyone." Retrieve the resulting `/exec` URL.
    If this step fails on a permissions error, stop here and report the
-   exact error — don't retry blindly or fall back to a different access
+   exact error - don't retry blindly or fall back to a different access
    level without saying so.
 
 4. **Self-test the deployment.** `GET {url}?action=ping` and confirm the
    response is `{"ok":true,...}`. If this fails, stop and report before
-   continuing — steps 5+ are pointless against a broken backend.
+   continuing - steps 5+ are pointless against a broken backend.
 
 5. **Wire the URL into the repo.** Replace
    `PASTE_SHARED_APPS_SCRIPT_WEB_APP_URL_HERE` in both `web/index.html` and
@@ -92,10 +92,10 @@ OAuth consent replaces.
     responder email from step 1 actually received a message with a maps
     link when step 6 ran. If no email arrived, check the Apps Script
     execution log for the `notifyResponders` call before assuming it's
-    broken — MailApp failures there don't block the report itself, so the
+    broken - MailApp failures there don't block the report itself, so the
     report can succeed while the email silently fails.
 
-8. **Delete the test row** from the Sheet directly — don't leave it for a
+8. **Delete the test row** from the Sheet directly - don't leave it for a
    real user to see.
 
 9. **Push to the existing repo, on a new branch.** Don't touch `main`.
@@ -103,13 +103,13 @@ OAuth consent replaces.
 
 10. **Check Pages before touching it.** If GitHub Pages is already enabled
     on this repo serving something else, stop and report that before
-    changing anything — switching Pages to the `roadwatch` branch will
+    changing anything - switching Pages to the `roadwatch` branch will
     replace whatever it currently serves, not add a second site alongside
     it. If Pages isn't in use yet, enable it on the `roadwatch` branch
     (`web` folder, or repo root if this branch's Pages config needs that).
 
 11. **Verify the live map** by fetching the published Pages URL and
-    confirming the page loads (a fetch/curl check is enough — you don't
+    confirming the page loads (a fetch/curl check is enough - you don't
     need a screenshot).
 
 ## Report back when done
@@ -117,13 +117,13 @@ OAuth consent replaces.
 - The live map URL
 - The GitHub repo URL
 - Confirmation that steps 4, 6, and 7 passed
-- Anything that failed or required a manual step, named specifically —
+- Anything that failed or required a manual step, named specifically -
   not glossed over
 
 ## What Claude Code should NOT do
 
 - Don't lower the deployment access level below "Anyone" to work around an
-  auth error — that breaks the whole point (a stranger with the repo link
+  auth error - that breaks the whole point (a stranger with the repo link
   needs to hit this with no login). Report the error instead.
 - Don't invent a workaround for the script.google.com toggle. If it wasn't
   turned on, stop and say so plainly.
